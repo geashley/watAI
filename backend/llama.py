@@ -1,42 +1,52 @@
 import requests
-from parser import parse_content  # Import your custom parser function
 import os
 from dotenv import load_dotenv
+from huggingface_hub import HfApi, whoami
+from parser import parse_content  # Your custom parser function
 
-
-# API URL and Authorization Header
-API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.3-70B-Instruct"
-
-
-# Load environment variables from .env file (if it exists)
+# Load API key
 load_dotenv()
-
 api_key = os.getenv("HUGGINGFACE_API_KEY")
-
-# Parse the content using your custom function
-parsed_content = parse_content()
-
 if not api_key:
-    raise ValueError("API key not found. Please set HUGGINGFACE_API_KEY in your environment or .env file.")
+    raise ValueError("API key not found. Please set HUGGINGFACE_API_KEY in your environment.")
 
+# Optional: Print account info to verify connection
+api = HfApi()
+print(whoami())
+
+# Use the BART-based summarization model
+API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 headers = {"Authorization": f"Bearer {api_key}"}
 
+# Parse the input content from your JSON file
+json_file_path = 'data.json'
+parsed_content = parse_content(json_file_path)
 
-# Prepare the input data for summarization
+# Convert parsed content into a formatted string
+text_to_summarize = f"will this product help me silence my dog?: {parsed_content.get('title', 'No title')}. " \
+                    f"Features: {' '.join(parsed_content.get('features', []))}. " \
+                    f"Description: {' '.join(parsed_content.get('description', [])).strip()}."
+
+print("Text to summarize:", text_to_summarize)  # Debugging step
+print("\n")
+
+# Prepare the correct input format for the BART model
 data = {
-    "inputs": f"Summarize the following content: {parsed_content}",
+    "inputs": text_to_summarize,  # BART requires a simple text string, not chat-style messages
     "parameters": {
-        "max_length": 200,  # Limit the output length of the summary
-        "temperature": 0.7  # Optional: Control creativity (lower = less creative)
+        "max_length": 200,  # Adjust length as needed
+        "temperature": 0.7
     }
 }
 
-# Send a POST request to Hugging Face's API
-response = requests.post(API_URL, headers=headers, json=data)
-
-# Handle and display the response
-if response.status_code == 200:
-    result = response.json()
-    print("Summary:", result[0]["generated_text"])  # Print the summarized text
-else:
-    print(f"Error {response.status_code}: {response.json()}")
+# Send request to Hugging Face API
+try:
+    response = requests.post(API_URL, headers=headers, json=data, timeout=300)
+    
+    if response.status_code == 200:
+        result = response.json()
+        print("Summary:", result[0]["summary_text"])  # Correct key for BART models
+    else:
+        print(f"Error {response.status_code}: {response.json()}")
+except Exception as e:
+    print("An error occurred:", e)
