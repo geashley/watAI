@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 import "./homepage.css";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 const Homepage: React.FC = () => {
   const [productLinks, setProductLinks] = useState("");
@@ -15,37 +18,51 @@ const Homepage: React.FC = () => {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
-      <ShaderGradientCanvas
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <ShaderGradient
-          control="query"
-          urlString="https://www.shadergradient.co/customize?animate=on&axesHelper=on&bgColor1=%23000000&bgColor2=%23000000&brightness=1.1&cAzimuthAngle=180&cDistance=2.9&cPolarAngle=115&cameraZoom=1&color1=%235606FF&color2=%23FE8989&color3=%23000000&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=45&frameRate=10&grain=off&lightType=3d&pixelDensity=1&positionX=-0.5&positionY=0.1&positionZ=0&range=enabled&rangeEnd=40&rangeStart=0&reflection=0.1&rotationX=0&rotationY=0&rotationZ=235&shader=defaults&toggleAxis=false&type=waterPlane&uAmplitude=0&uDensity=1.1&uFrequency=5.5&uSpeed=0.1&uStrength=2.4&uTime=0.2&wireframe=false&zoomOut=false"
-        />
-      </ShaderGradientCanvas>
-      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', textAlign: 'center' }}>
-        <h1 className="font-semibold text-4xl">ComparaSum</h1>
-        <input
-          type="text"
-          placeholder="Paste your Amazon product links here!."
-          value={productLinks}
-          onChange={handleInputChange}
-          className="w-[10000px] p-[1500px] rounded-full text-white bg-purple-900 border-none outline-none placeholder-gray-300"
-        />
-        <br />
-        <button
-          onClick={handleSubmit}
-          className="mt-4 px-6 py-3 bg-white text-purple-900 font-semibold rounded-full shadow-md hover:bg-gray-200 transition"
+    <div className="fixed inset-0 overflow-hidden">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 z-0">
+        <ShaderGradientCanvas
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: -1, 
+          }}
         >
-          Compare
-        </button>
+          <ShaderGradient
+            control="query"
+            urlString="https://www.shadergradient.co/customize?animate=on&axesHelper=on&bgColor1=%23000000&bgColor2=%23000000&brightness=1.1&cAzimuthAngle=180&cDistance=2.9&cPolarAngle=115&cameraZoom=1&color1=%235606FF&color2=%23FE8989&color3=%23000000&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=45&frameRate=10&grain=off&lightType=3d&pixelDensity=1&positionX=-0.5&positionY=0.1&positionZ=0&range=enabled&rangeEnd=40&rangeStart=0&reflection=0.1&rotationX=0&rotationY=0&rotationZ=235&shader=defaults&toggleAxis=false&type=waterPlane&uAmplitude=0&uDensity=1.1&uFrequency=5.5&uSpeed=0.1&uStrength=2.4&uTime=0.2&wireframe=false&zoomOut=false"
+          />
+        </ShaderGradientCanvas>
+      </div>
+
+      {/* Content */}
+      <div className="content">
+        <div className="text-container">
+          <h1 className="font-serif text-white mmb-2 text-7xl">ComparaSum</h1>
+          <p className="slogan">Smart summaries, smarter decisions.</p>
+          
+          <Card className="w-full max-w-2xl border-none shadow-2xl bg-white/10 backdrop-blur-md">
+            <div className="row">
+              <Input
+                type="text"
+                placeholder="Paste your Amazon links here..."
+                value={productLinks}
+                onChange={handleInputChange}
+                className="flex-1 h-12 px-6 text-white border-none rounded-full bg-white/20 placeholder:text-white/60"
+              />
+              <Button 
+                onClick={handleSubmit}
+                size="icon"
+                className="w-12 h-12 text-purple-900 bg-white rounded-full hover:bg-white/90"
+              >
+                →
+              </Button>
+            </div>
+          </Card>
+          </div>
       </div>
     </div>
   );
