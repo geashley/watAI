@@ -1,41 +1,73 @@
 import mysql.connector  
+import os 
+from dotenv import load_dotenv
 
-# Replace these with your actual RDS credentials
-host = 'my-db-instance.ctuqm8m24ut8.us-east-2.rds.amazonaws.com'
-database = 'my_db_instance'
-user = 'admin'
-password = 'Elyssa1024768'
+load_dotenv()
+# Load environment variables securely
+host = os.getenv('DB_HOST')
+database = os.getenv('DB_NAME')
+user = os.getenv('DB_USER')
+password = os.getenv('DB_PASSWORD')
 
-cursor = mysql.connector.cursor()
+# Ensure credentials are set
+if not all([host, database, user, password]):
+    raise ValueError("Database credentials are missing! Set them as environment variables.")
 
-# Get the ASIN input from the user (or hardcode it in)
-asin_input = 'B00BKSPPVA'  # Replace with the ASIN you're interested in
+try:
+    # Establish a secure database connection
+    conn = mysql.connector.connect(
+        host=host,
+        database=database,
+        user=user,
+        password=password
+    )
 
-# Write the query to get the "text" for the reviews with the specified ASIN
-query = """
-    SELECT review_text 
-    FROM reviews 
-    WHERE parent_asin = %s;
-"""
+    if conn.is_connected():
+        print("Connected to MySQL database.")
 
-# Execute the query
-cursor.execute(query, (asin_input,))
+        # Create a cursor
+        cursor = conn.cursor()
 
-# Fetch all results
-reviews = cursor.fetchall()
+        # ASIN input
+        asin_input = 'B003JN5ZEG'  # Replace with actual ASIN if needed
 
-# Create a long string by concatenating all the review texts
-long_review_text = ' '.join([review[0] for review in reviews])
+        # Query to fetch review text for the given ASIN
+        query = """
+            SELECT text 
+            FROM reviews3 
+            WHERE asin = %s;
+        """
 
-# Close the cursor and connection
-cursor.close()
-conn.close()
+        cursor.execute(query, (asin_input,))
+        
+        # Add debugging information
+        print(f"Query executed: {cursor._check_executed()}")
+        reviews = cursor.fetchall()
+        print(reviews)
+        print(f"Number of reviews found: {len(reviews)}")
 
-# Define the output file path
-output_file = 'reviews_for_asin.txt'
+        # Concatenate all review texts into a single string
+        long_review_text = ' '.join([review[0] for review in reviews])
+        
+        # Print first few reviews to verify
+        for i, review in enumerate(reviews[:5]):
+            print(f"Review {i+1}: {review[0][:100]}...")  # Print first 100 chars of each review
 
-# Open the file in write mode to overwrite it
-with open(output_file, 'w') as file:
-    file.write(long_review_text)
+        # Define output file path
+        output_file = 'reviews_for_asin.txt'
 
-print(f"Reviews for ASIN {asin_input} saved to {output_file}")
+        # Write reviews to file securely
+        with open(output_file, 'w') as file:
+            file.write(long_review_text)
+
+        print(f"Reviews for ASIN {asin_input} saved to {output_file}")
+
+except mysql.connector.Error as e:
+    print(f"Error connecting to MySQL: {e}")
+
+finally:
+    # Ensure cursor and connection are closed
+    if 'cursor' in locals():
+        cursor.close()
+    if 'conn' in locals() and conn.is_connected():
+        conn.close()
