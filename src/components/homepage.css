@@ -47,14 +47,6 @@ canvas {
     margin: 0;
   }
 
-  .heading {
-    position: relative; 
-    width: 100%; 
-    display: flex; 
-    z-index: 10; 
-    justify-content: center; 
-    align-items: center; 
-  }
 
   h1 {
     font-family: 'STIX Two Math', serif; /* Example font for the name */
@@ -75,5 +67,8 @@ canvas {
   .row { 
     display: flex; 
     flex-direction: row; 
-    gap: 15px;
+    gap: 11px;
+    width: 100%; 
+    justify-content: center; 
   }
+

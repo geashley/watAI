@@ -3,7 +3,6 @@ import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 import "./homepage.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 
 const Homepage: React.FC = () => {
   const [productLinks, setProductLinks] = useState("");
@@ -43,25 +42,25 @@ const Homepage: React.FC = () => {
         <div className="text-container">
           <h1 className="font-serif text-white mmb-2 text-7xl">ComparaSum</h1>
           <p className="slogan">Smart summaries, smarter decisions.</p>
-          
-          <Card className="w-full max-w-2xl border-none shadow-2xl bg-white/10 backdrop-blur-md">
-            <div className="row">
+        
+          <div className="row">
               <Input
                 type="text"
                 placeholder="Paste your Amazon links here..."
                 value={productLinks}
                 onChange={handleInputChange}
-                className="flex-1 h-12 px-6 text-white border-none rounded-full bg-white/20 placeholder:text-white/60"
+                style = {{
+                  width: "20%",
+                }}
               />
               <Button 
                 onClick={handleSubmit}
                 size="icon"
-                className="w-12 h-12 text-purple-900 bg-white rounded-full hover:bg-white/90"
+                className="text-xl text-white bg-black rounded-full w-14 h-14 hover:bg-black/90"
               >
                 →
               </Button>
             </div>
-          </Card>
           </div>
       </div>
     </div>
