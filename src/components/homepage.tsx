@@ -147,7 +147,8 @@ const Homepage: React.FC = () => {
               </div>
             </div>
           </Card>
-
+          
+          {/* Error message for user and development*/}
           {error && (
             <p className="error-message">{error}</p>
           )}
