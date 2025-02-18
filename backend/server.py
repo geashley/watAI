@@ -1,39 +1,44 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS 
-from reviewSummary import get_reviews, generate_summary  # Import your review function
+from reviewSummary import get_reviews, generate_summary
 
 app = Flask(__name__)
 
 # Configure CORS properly
 CORS(app) 
 
-@app.route('/reviewpages', methods=['POST', 'OPTIONS'])
+@app.route('/reviewpages', methods=['POST'])
 def process_reviews():
-    if request.method == 'OPTIONS':
-        return jsonify({}), 200
-        
     try:
         data = request.json
         asin_list = data.get('asinList', [])
         
         if not asin_list:
-            raise ValueError("No Amazon IDs provided")
+            return jsonify({
+                'success': False,
+                'error': "No Amazon IDs provided"
+            }), 400
             
-        # Process each ASIN and get summaries
         summaries = {}
         for asin in asin_list:
-            reviews = get_reviews(asin)
-            summary = generate_summary(reviews)
-            summaries[asin] = summary # dictionary of asins and summaries
-
-        print(summaries) # should print the dictionary of asin and summaries out 
+            try:
+                reviews = get_reviews(asin)
+                if not reviews:
+                    summaries[asin] = {"error": f"No reviews found for ASIN: {asin}"}
+                    continue
+                    
+                summary = generate_summary(reviews)
+                summaries[asin] = summary
+            except Exception as e:
+                summaries[asin] = {"error": f"Failed to process ASIN {asin}: {str(e)}"}
 
         return jsonify({
             'success': True,
             'reviews': summaries
         })
+        
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Server error: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -45,4 +50,4 @@ def process_reviews():
 #     pass
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8000)
