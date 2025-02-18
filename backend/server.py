@@ -1,12 +1,17 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Don't forget to install this: pip install flask-cors
+from flask_cors import CORS 
 from reviewSummary import get_reviews, generate_summary  # Import your review function
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
-@app.route('/reviewpages', methods=['POST'])
+# Configure CORS properly
+CORS(app)
+
+@app.route('/reviewpages', methods=['POST', 'OPTIONS'])
 def process_reviews():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+        
     try:
         data = request.json
         asin_list = data.get('asinList', [])
@@ -28,6 +33,7 @@ def process_reviews():
             'reviews': summaries
         })
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -39,4 +45,4 @@ def process_reviews():
 #     pass
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=3000)

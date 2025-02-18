@@ -27,11 +27,11 @@ def get_reviews(asin):
         )
 
         if conn.is_connected():
-            cursor = conn.cursor()
+            cursor = conn.cursor(dictionary=True)
 
-            # Query to fetch review text
+            # Query to fetch review text and rating
             query = """
-                SELECT text 
+                SELECT text, rating 
                 FROM reviews3 
                 WHERE asin = %s;
             """
@@ -40,12 +40,9 @@ def get_reviews(asin):
             reviews = cursor.fetchall()
             
             # Format reviews for AI processing
-            review_list = [{"text": review[0], "rating": 0} for review in reviews]
+            review_list = [{"text": review["text"], "rating": review["rating"]} for review in reviews]
             
-            # Generate AI summary from the reviews
-            summary = generate_summary(review_list)
-            
-            return summary
+            return review_list
 
     except mysql.connector.Error as e:
         raise Exception(f"Database error: {str(e)}")
