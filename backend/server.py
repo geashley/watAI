@@ -5,7 +5,7 @@ from reviewSummary import get_reviews, generate_summary  # Import your review fu
 app = Flask(__name__)
 
 # Configure CORS properly
-CORS(app)
+CORS(app) 
 
 @app.route('/reviewpages', methods=['POST', 'OPTIONS'])
 def process_reviews():
@@ -45,4 +45,4 @@ def process_reviews():
 #     pass
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=5000)
