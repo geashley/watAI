@@ -94,7 +94,7 @@ h1 {
   border-radius: 30px;
   outline: none;
   width: 550px;
-  text-align: center;
+  text-align: left;
 }
 
 .input-field::placeholder {
