@@ -57,24 +57,27 @@ def get_reviews(asin):
 def generate_summary(reviews):
     load_dotenv()
     
-    # Get API key
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         raise ValueError("GROQ API key not found")
 
     client = Groq(api_key=api_key)
 
-    # Format reviews into text
     review_texts = [f"Review: {review['text']}" for review in reviews]
     all_reviews_text = "\n".join(review_texts)
 
-    # Generate summary using AI
+    # Modified prompt to request JSON-like structure
     prompt = (
-        "Based on the following reviews, please provide a structured summary that includes:\n"
-        "1. An overall summary of the product in your own words.\n"
-        "2. The top 3 pros in bullet points.\n"
-        "3. The top 3 cons in bullet points.\n\n"
+        "Based on the following reviews, please provide a summary in this exact format:\n"
+        "SUMMARY: [overall product summary]\n"
+        "PRO1: [first major pro]\n"
+        "PRO2: [second major pro]\n"
+        "PRO3: [third major pro]\n"
+        "CON1: [first major con]\n"
+        "CON2: [second major con]\n"
+        "CON3: [third major con]\n\n"
         f"{all_reviews_text}\n\n"
+        "Please maintain the exact format with SUMMARY:, PRO1:, etc. at the start of each line."
     )
     
     response = client.chat.completions.create(
@@ -83,8 +86,17 @@ def generate_summary(reviews):
         ],
         model="llama-3.3-70b-versatile",
     )
+
+    # Parse the response into a dictionary
+    content = response.choices[0].message.content
+    summary_dict = {}
     
-    return response.choices[0].message.content
+    for line in content.split('\n'):
+        if ':' in line:
+            key, value = line.split(':', 1)
+            summary_dict[key.strip()] = value.strip()
+
+    return summary_dict
 
 if __name__ == "__main__":
     # Test the function
