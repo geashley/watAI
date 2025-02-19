@@ -38,9 +38,9 @@ const Homepage: React.FC = () => {
     setError(null);
 
     try {
-      console.log('Sending ASINs:', asinsToSubmit); // Debug log
+      console.log('Sending ASINs:', asinsToSubmit);
       
-      const response = await fetch('http://localhost:3000/reviewpages', {
+      const response = await fetch('http://localhost:8000/reviewpages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

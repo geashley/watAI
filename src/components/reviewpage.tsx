@@ -1,11 +1,33 @@
- import React from "react";
+import React, { useEffect, useState } from "react";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 import "./reviewpage.css";
 
+interface ReviewData {
+  PRODUCT_NAME: string;
+  AVERAGE_RATING: string;
+  SUMMARY: string;
+  PROS: string[];
+  CONS: string[];
+  asin: string;
+}
+
 const ReviewPage: React.FC = () => {
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
 
+  useEffect(() => {
+    // Get the data from localStorage that was saved in homepage
+    const savedReviews = localStorage.getItem('reviewData');
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews));
+    }
+  }, []);
 
-    
+  // Helper function to render stars based on rating
+  const renderStars = (rating: string) => {
+    const numStars = parseFloat(rating);
+    return "⭐".repeat(numStars);
+  };
+
   return (
     <div className="container">
       {/* ✅ ShaderGradient Background */}
@@ -18,32 +40,34 @@ const ReviewPage: React.FC = () => {
         </ShaderGradientCanvas>
       </div>
 
-      {/* ✅ Rounded Box with Review Content */}
-      <div className="rounded-box">
-        <div className="content">
-          <h1 className="title">Product Name</h1>
-          <p className="rating">Rating: ⭐⭐⭐⭐⭐</p>
-          <p className="summary">This is a general statement of how users feel about the product.</p>
-          <div className="pros-cons-container">
-            <div className="pros">
-              <h2>Pros</h2>
-              <ul>
-                <li>Pro #1</li>
-                <li>Pro #2</li>
-                <li>Pro #3</li>
-              </ul>
-            </div>
-            <div className="cons">
-              <h2>Cons</h2>
-              <ul>
-                <li>Con #1</li>
-                <li>Con #2</li>
-                <li>Con #3</li>
-              </ul>
+      {/* Map through reviews array and display each review */}
+      {reviews.map((review, index) => (
+        <div key={review.asin || index} className="rounded-box">
+          <div className="content">
+            <h1 className="title">{review.PRODUCT_NAME}</h1>
+            <p className="rating">Rating: {renderStars(review.AVERAGE_RATING)}</p>
+            <p className="summary">{review.SUMMARY}</p>
+            <div className="pros-cons-container">
+              <div className="pros">
+                <h2>Pros</h2>
+                <ul>
+                  {review.PROS.map((pro, idx) => (
+                    <li key={idx}>{pro}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="cons">
+                <h2>Cons</h2>
+                <ul>
+                  {review.CONS.map((con, idx) => (
+                    <li key={idx}>{con}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 };

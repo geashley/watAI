@@ -19,22 +19,31 @@ def process_reviews():
                 'error': "No Amazon IDs provided"
             }), 400
             
-        summaries = {}
+        summaries = []  # Changed from dict to list
         for asin in asin_list:
             try:
                 reviews = get_reviews(asin)
                 if not reviews:
-                    summaries[asin] = {"error": f"No reviews found for ASIN: {asin}"}
+                    summaries.append({
+                        "asin": asin,
+                        "error": f"No reviews found for ASIN: {asin}"
+                    })
                     continue
                     
                 summary = generate_summary(reviews)
-                summaries[asin] = summary
+                summary["asin"] = asin  # Add ASIN to the summary
+                summaries.append(summary)  # Append to list instead of dict
+
+                print(summaries)
             except Exception as e:
-                summaries[asin] = {"error": f"Failed to process ASIN {asin}: {str(e)}"}
+                summaries.append({
+                    "asin": asin,
+                    "error": f"Failed to process ASIN {asin}: {str(e)}"
+                })
 
         return jsonify({
             'success': True,
-            'reviews': summaries
+            'reviews': summaries  # Now it's an array of dictionaries
         })
         
     except Exception as e:
@@ -44,10 +53,5 @@ def process_reviews():
             'error': str(e)
         }), 500
 
-# def extract_asin(url):
-#     # Implement ASIN extraction from Amazon URL
-#     # Example: https://www.amazon.com/dp/B003JN5ZEG -> B003JN5ZEG
-#     pass
-
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=6000)
