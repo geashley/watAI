@@ -1,3 +1,1 @@
-### AMAZON AMAZON AMAZON AMAZON 
-
-## hello 
+### Hey! Check out https://devpost.com/software/comparasum
